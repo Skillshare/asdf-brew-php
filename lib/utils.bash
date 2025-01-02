@@ -118,8 +118,14 @@ install_version() {
 	fi
 
 	(
-		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+		log_header "Installing PHP ${ASDF_INSTALL_VERSION}"
+
+		local formula="php@${ASDF_INSTALL_VERSION}"
+
+		mkdir -p "$(dirname "$install_path")"
+
+		log_exec_command brew install "${formula}" --no-binaries
+		log_exec_command ln -s "$(brew --prefix "${formula}")/bin" "${install_path}"
 
 		# TODO: Assert brew-php executable exists.
 		local tool_cmd
