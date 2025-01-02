@@ -31,9 +31,9 @@ list_github_tags() {
 }
 
 list_brew_versions() {
-	brew info php --json \
-		| jq -re '.[0].aliases + .[0].versioned_formulae | .[]' \
-		| cut -d '@' -f 2
+	brew info php --json |
+		jq -re '.[0].aliases + .[0].versioned_formulae | .[]' |
+		cut -d '@' -f 2
 }
 
 list_all_versions() {
@@ -55,57 +55,57 @@ download_release() {
 }
 
 log_header() {
-  echo '=>' "$@" 1>&2
+	echo '=>' "$@" 1>&2
 }
 
 log_indicator() {
-  echo '->' "$@" 1>&2
+	echo '->' "$@" 1>&2
 }
 
 log() {
-  echo "$@" 1>&2
+	echo "$@" 1>&2
 }
 
 log_color_with_fallback() {
-  local colored="$1" plain="$2"
-  if tput colors &> /dev/null; then
-    echo -e "$colored" 1>&2
-  else
-    echo "$plain" 1>&2
-  fi
+	local colored="$1" plain="$2"
+	if tput colors &>/dev/null; then
+		echo -e "$colored" 1>&2
+	else
+		echo "$plain" 1>&2
+	fi
 }
 
 log_debug() {
-  # XXX: Light gray color
-  log_color_with_fallback \
-    "\033[0;33m-> $*\033[0m" \
-    "-> $@"
+	# XXX: Light gray color
+	log_color_with_fallback \
+		"\033[0;33m-> $*\033[0m" \
+		"-> $@"
 }
 
 log_error() {
-  # XXX: Red
-  log_color_with_fallback \
-    "\033[31mERROR: $*\033[0m" \
-    "ERROR: $@"
+	# XXX: Red
+	log_color_with_fallback \
+		"\033[31mERROR: $*\033[0m" \
+		"ERROR: $@"
 }
 
 log_warn() {
-  # XXX: bright yellow
-  log_color_with_fallback \
-    "\033[1;33m-> $*\033[0m" \
-    "-> $@"
+	# XXX: bright yellow
+	log_color_with_fallback \
+		"\033[1;33m-> $*\033[0m" \
+		"-> $@"
 }
 
 log_success() {
-  # XXX: green
-  log_color_with_fallback \
-    "\033[32m-> $*\033[0m" \
-    "-> $@"
+	# XXX: green
+	log_color_with_fallback \
+		"\033[32m-> $*\033[0m" \
+		"-> $@"
 }
 
 log_exec_command() {
-  log_debug '$' "$@"
-  "$@"
+	log_debug '$' "$@"
+	"$@"
 }
 
 install_version() {
