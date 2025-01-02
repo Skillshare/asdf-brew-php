@@ -30,10 +30,16 @@ list_github_tags() {
 		sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
 }
 
+list_brew_versions() {
+	brew info php --json \
+		| jq -re '.[0].aliases + .[0].versioned_formulae | .[]' \
+		| cut -d '@' -f 2
+}
+
 list_all_versions() {
 	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
 	# Change this function if brew-php has other means of determining installable versions.
-	list_github_tags
+	list_brew_versions
 }
 
 download_release() {
