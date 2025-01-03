@@ -30,10 +30,16 @@ list_github_tags() {
 		sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
 }
 
+list_brew_versions() {
+	brew info php --json |
+		jq -re '.[0].aliases + .[0].versioned_formulae | .[]' |
+		cut -d '@' -f 2
+}
+
 list_all_versions() {
 	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
 	# Change this function if brew-php has other means of determining installable versions.
-	list_github_tags
+	list_brew_versions
 }
 
 download_release() {
@@ -48,6 +54,60 @@ download_release() {
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
+log_header() {
+	echo '=>' "$@" 1>&2
+}
+
+log_indicator() {
+	echo '->' "$@" 1>&2
+}
+
+log() {
+	echo "$@" 1>&2
+}
+
+log_color_with_fallback() {
+	local colored="$1" plain="$2"
+	if tput colors &>/dev/null; then
+		echo -e "$colored" 1>&2
+	else
+		echo "$plain" 1>&2
+	fi
+}
+
+log_debug() {
+	# XXX: Light gray color
+	log_color_with_fallback \
+		"\033[0;33m-> $*\033[0m" \
+		"-> $@"
+}
+
+log_error() {
+	# XXX: Red
+	log_color_with_fallback \
+		"\033[31mERROR: $*\033[0m" \
+		"ERROR: $@"
+}
+
+log_warn() {
+	# XXX: bright yellow
+	log_color_with_fallback \
+		"\033[1;33m-> $*\033[0m" \
+		"-> $@"
+}
+
+log_success() {
+	# XXX: green
+	log_color_with_fallback \
+		"\033[32m-> $*\033[0m" \
+		"-> $@"
+}
+
+log_exec_command() {
+	log_debug '$' "$@"
+	"$@"
+}
+
 install_version() {
 	local install_type="$1"
 	local version="$2"
@@ -58,8 +118,14 @@ install_version() {
 	fi
 
 	(
-		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+		log_header "Installing PHP ${ASDF_INSTALL_VERSION}"
+
+		local formula="php@${ASDF_INSTALL_VERSION}"
+
+		mkdir -p "$(dirname "$install_path")"
+
+		log_exec_command brew install "${formula}" --no-binaries
+		log_exec_command ln -s "$(brew --prefix "${formula}")/bin" "${install_path}"
 
 		# TODO: Assert brew-php executable exists.
 		local tool_cmd
