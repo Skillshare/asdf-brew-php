@@ -7,7 +7,7 @@
 </div>
 
 Why this plugin? Compiling PHP is not deterministic on macOS. Relying
-on existing [brew][https://brew.sh] bottles is more deterministic.
+on existing [brew](https://brew.sh) bottles is more deterministic.
 This plugin trades off compiling an explicit major, minor, and patch
 level PHP for whatever precompiled major and minor version is
 available in brew.
